@@ -1,0 +1,89 @@
+\documentclass[11pt]{article}
+\usepackage{latexsym}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{epsfig}
+\usepackage[right=0.8in, top=1in, bottom=1in, left=0.8in]{geometry}
+\usepackage{setspace}
+\usepackage{bbold}
+\usepackage{mathtools}
+
+\newcommand{\zo}{\{0,1\}}
+\newcommand{\mzo}{\{-1,+1\}}
+\newcommand{\F}{{\mathbb{F}}}
+\newcommand{\N}{{\mathbb{N}}}
+\newcommand{\Z}{{\mathbb{Z}}}
+\newcommand{\R}{{\mathbb{R}}}
+\newcommand{\C}{{\mathbb{C}}}
+\newcommand{\eps}{\epsilon}
+\newcommand{\tO}{\tilde{O}}
+\newcommand{\Vol}{\mathop\mathrm{Vol}\nolimits}
+\newcommand{\Const}{\mathop\mathrm{Const}\nolimits}
+\newcommand{\EX}{{\mathbb E}}
+\newcommand{\Sur}{\mathop\mathrm{Sur}\nolimits}
+\newcommand{\polylog}{\mathop\mathrm{polylog}\nolimits}
+\newcommand{\xor}{\oplus}
+\newcommand{\conj}[1]{{\overline {#1}}} %% conjugate
+\DeclareMathOperator{\ed}{ed}
+\DeclareMathOperator{\inv}{inv}
+\DeclareMathOperator{\poly}{poly}
+\DeclareMathOperator{\sk}{{\bf sk}}
+\DeclareMathOperator{\Supp}{supp}
+\DeclareMathOperator{\wt}{wt}
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+
+\newcommand{\E}{{\mathbb E}}
+\newcommand{\Var}{{\bold {Var}}}
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+
+\spacing{1.06}
+
+\newcommand{\handout}[5]{
+  \noindent
+  \begin{center}
+  \framebox{
+    \vbox{\vspace{0.25cm}
+      \hbox to 5.78in { {COMS E6998-9:\hspace{0.12cm}Algorithmic
+          Techniques for Massive Data} \hfill #2 }
+      \vspace{0.48cm}
+      \hbox to 5.78in { {\Large \hfill #5  \hfill} }
+      \vspace{0.42cm}
+      \hbox to 5.78in { {#3 \hfill #4} }\vspace{0.25cm}
+    }
+  }
+  \end{center}
+  \vspace*{4mm}
+}
+
+\newcommand{\lecture}[3]{\handout{#1}{#2}{#3}{}{#1}}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{observation}[theorem]{Observation}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{claim}[theorem]{Claim}
+\newtheorem{fact}[theorem]{Fact}
+\newtheorem{assumption}[theorem]{Assumption}
+
+\begin{document}
+
+
+\handout{}{Nov 6th, 2015}{By:\hspace{0.08cm}\emph{Yang, Shekel Nosatzki, Loganathan (UNI: \emph{cy2417, ns3049, pl2487})}}{}{Project Proposal - LSH w/o False Negatives}
+
+\section{Background}
+As we have seen in class, most LSH algorithms are using random hash functions, each with high probability of collision of close points, and low probability of collision of far points, and taking many of such hash tables, each {\em independent} from one another, we can prove that with very high probability close points will collide and far points will not collide.
+The subject article provide a fresh look into the problem by taking hash functions that are {\em dependent} of each other in a way, that removes the low probability that close points will never collide.\newline\newline
+The article focuses on the Hamming Space, where a hash function is  coordinate sampling. Instead of sampling random coordinates on each hash function, the author suggests a method to pre-select sampling that are {\em ``$r$-covering''}, using a generating function $m$. The author shows that under certain assumptions on the $n$,$r$,$c$ parameters, the algorithm can match the performance of non-deterministic algorithms which do not guarantee success.
+
+\section{Extension of Findings}
+In our project, we will attempt to extend the idea in the article. We will explore several directions:
+\begin{itemize}
+	\item \textbf{Other metric spaces} - since non-trivial embeddings have randomization, our focus will be in implementing correlated hash functions in $l_1$, $l_2$, and possibly other metric spaces. We will consider looking at simplified discreet versions of such spaces (e.g. integers only).
+	\item \textbf{Data-Dependent Hashing} - the article assumes no a-priori information about our data. Here we can look not only on having the hash functions dependent on each other, but also on the data, to make sure collision are found. We will focus on a {\em ``random-case''} - i.e. where the data is behaving ``as expected'', and will consider different metrics for such an extension.
+	\item \textbf{Minhash} - We will consider the effect of the hash function construction in the case of sparse vectors and suggest improvements to the algorithm if such are necessary.
+	\item \textbf{Different Settings} - While the article does generalize the performance under any settings (mainly in terms of $n$, $r$, $c$) - the focus of the article is on certain setting which yield $\rho = \frac{1}{c}$. We will consider different settings which generate sub-optimal performance, and see if there is any room for improvement under such settings.
+\end{itemize}
+Depending on our success in finding a concrete extension - we will either focus on that concrete extension or analyze the observations we will find in different extension attempts.
+\end{document}
