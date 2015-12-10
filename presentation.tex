@@ -1,0 +1,339 @@
+% beamer presentation template - rax 05.10.12
+% main data
+\def \ver {1.0}			% version number
+\def \showver {0}		% 1 = show version/build; 0 = not show
+\def \maintitle {Locality-sensitive hashing without false negatives in $\ell_1$}
+\def \lauthors {Negev Shekel-Nosatzki, Chen-Yu Yang, Parthiban Loganathan}
+\def \sauthors {N. Shekel-Nosatzki, C. Yang, P. Loganathan}
+\def \presenter {N. Shekel-Nosatzki, C. Yang, P. Loganathan}
+\def \home {Department of Computer Science\\Columbia University}
+\def \venue {COMS 6998: Algorithmic Techniques for Massive Data}
+\def \ldate {December 2015}
+
+% ****************************************************************************
+% Document Start
+\documentclass[xcolor=svgnames]{beamer}
+
+% **** packages ****
+\usepackage[english]{babel}
+\usepackage{rax_beamerpack}
+\usepackage[utf8]{inputenc}
+\usepackage{tikz}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{algorithm2e}
+\usepackage{dirtytalk}
+\usepackage{mathtools}
+\usepackage{color}
+
+\newcommand{\zo}{\{0,1\}}
+\newcommand{\mzo}{\{-1,+1\}}
+\newcommand{\F}{{\mathbb{F}}}
+\newcommand{\N}{{\mathbb{N}}}
+\newcommand{\Z}{{\mathbb{Z}}}
+\newcommand{\R}{{\mathbb{R}}}
+\newcommand{\C}{{\mathbb{C}}}
+\newcommand{\BO}{{\mathcal{O}}}
+\newcommand{\eps}{\epsilon}
+\newcommand{\tO}{\tilde{O}}
+\newcommand{\Vol}{\mathop\mathrm{Vol}\nolimits}
+\newcommand{\Const}{\mathop\mathrm{Const}\nolimits}
+\newcommand{\EX}{{\mathbb E}}
+\newcommand{\Sur}{\mathop\mathrm{Sur}\nolimits}
+\newcommand{\polylog}{\mathop\mathrm{polylog}\nolimits}
+\newcommand{\xor}{\oplus}
+\newcommand{\conj}[1]{{\overline {#1}}} %% conjugate
+\DeclareMathOperator{\ed}{ed}
+\DeclareMathOperator{\inv}{inv}
+\DeclareMathOperator{\poly}{poly}
+\DeclareMathOperator{\sk}{{\bf sk}}
+\DeclareMathOperator{\Supp}{supp}
+\DeclareMathOperator{\wt}{wt}
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+
+\newcommand{\E}{{\mathbb E}}
+\newcommand{\Var}{{\bold {Var}}}
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+
+\definecolor{important}{RGB}{38, 90, 173}
+
+%\usepackage{beamerthemeshadow}
+\usetheme{Columbia}
+
+\graphicspath{ {img/} }
+% ****************************************************************************
+% Document Data
+\title[\shorttitle]{\maintitle}
+\subtitle{\sbtitle}
+\author[\sauthors]{\lauthors\\ \scriptsize{\em \home}}
+\institute{\venue\\ \tiny{\location}}
+\date[\sdate]{\scriptsize{\ldate}}
+
+% ****************************************************************************
+% Tikz stuff
+\usetikzlibrary{shapes,arrows,positioning,patterns}
+\tikzstyle{decision} = [diamond, draw, fill=blue!20, 
+    text width=8em, aspect=2, text badly centered, node distance=3cm, inner sep=0pt]
+\tikzstyle{block} = [rectangle, draw, fill=blue!20, 
+    text width=8em, text centered, rounded corners, minimum height=4em]
+\tikzstyle{line} = [draw, -latex']
+\tikzstyle{cloud} = [draw, ellipse,fill=red!20, node distance=3cm,
+    minimum height=2em]
+
+
+% ****************************************************************************
+\begin{document}
+
+%****************** Title Slide ******************
+\begin{frame}[plain]
+	\titlepage
+\end{frame}
+
+%****************** Outline Slide ******************
+\begin{frame}[plain]{Outline}
+	\tableofcontents
+\end{frame}
+
+%****************** Document ******************
+% *********************************************
+\section{Locality Sensitive Hashing Introduction}
+
+\begin{frame}{Locality Sensitive Hashing}
+\textbf{Goal:} A data structure to distinguish between close and far points with near-linear space and sub-linear query time. Can be used in Nearest Neighbor Search for example.
+
+\begin{definition}[informal]
+  A \emph{locality sensitive hash function, LSH} is a random hash function
+  $h:\mathbb{R}^d \to U$
+  ($h$ drawn from a family $\mathcal{H}$, $U$ some finite set) such that
+  \begin{enumerate}
+    \item $d(q,p) \leq r \implies \Pr[h(q)=h(p)] = P_1$ is \say{not-so-small}
+    \item $d(q,p) > cr \implies \Pr[h(q)=h(p)] = P_2$ is \say{small}
+  \end{enumerate}
+  Generally, $P_1<P_2$ and we use $n^\rho$ hash tables where:
+  \[ \rho = \frac{\log(1/P_1)}{\log(1/P_2)}.\]
+\end{definition}
+\end{frame}
+
+\begin{frame}{Locality Sensitive Hashing in Hamming}
+From class, LSH for Hamming Space $\{0,1\}^d$ with distance metric $\Ham(x,y)=|\{x_i\neq y_i\}|$.
+
+The hash family, $\mathcal{H} : \{g:\{0,1\}^d \to \{0,1\}^k\}$, is defined as:
+
+\[ g(p) := (h_1(p), h_2(p), \ldots, h_k(p)),\]
+where
+\[ h_i(p):= p_j \mbox{ for random } j \leftarrow [d].\]
+
+For NNS, we maintain $L = n^\rho$ such Hamming-LSH tables $g$.
+
+\end{frame}
+
+\begin{frame}{LSH from Pagh'16}
+\begin{itemize}
+    \item It's \textbf{covering} - guarantees collision for $\norm{x-y} \leq r$. ie. Probability of false negatives is 0.
+    \pause
+    \item Far points \textbf{collide with low probability}.
+    \pause
+    \item Chooses \textbf{correlated hash functions} instead of selecting them independently to cover all ways in which two points can be $r$ apart.
+    \pause
+    \item \textbf{Performance is almost as good} as what we saw in class where we had constant probability of false negatives. The algorithm is efficient if $r = \Theta(\log{n})$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Pagh's LSH Definition}
+\begin{theorem*}
+[Pagh'16] Given $S \subseteq \{0,1\}^d, c>1$ and $r \in \mathbf{N}$ there exists a data structure with parameter $\rho$ such that:
+\begin{itemize}
+	\item {\color{important}\large{On query $y \in \{0,1\}^d$ the data structure us guaranteed to return $x \in S$ with $\norm{x-y} < cr$ if there exists $x' \in S$ with $\norm{x'-y} \leq r$.}}
+	\item The size is $O(dn^{1+\rho})$ bits where $n = |S|$.
+	\item The expected query times is $O(n^\rho(1+d/w))$, where $w$ is the word length.
+	\item Parameter $\rho$ is a function of $n, r$ and $c$ bounded by $\rho \leq \min{\Big(\ln{4}/c + \frac{\log{r}}{\log{n}}, 1/c + \frac{r}{\log{n}}\Big)}$. {\color{important} \large{If $\log{(n)}/cr \in \mathbf{N}$, then $\rho = 1/c$.}}
+\end{itemize}
+\end{theorem*}
+\end{frame}
+
+\begin{frame}{Pagh LSH Construction}
+
+\small{
+$\mathcal{H}_{\mathcal{A}} = \{x \mapsto x \wedge a | a \in \mathcal{A}\}$ where $\mathcal{A} \subseteq \{0,1\}^d$ is a set of bit masks. We go through all $h \in \mathcal{H}_{\mathcal{A}}$ and check for collisions.
+
+$\mathcal{A}(m) = \{a(v) | v \in \{0,1\}^{r+1} \setminus \{\mathbf{0}\}\}$ where $a(v)_i = \langle m(i),v \rangle$ $\forall$ $v \in \{0,1\}^{r+1}$ and $m : \{1,\cdots,d\} \rightarrow \{0,1\}^{r+1}$.\newline
+Pick random function $m$ uniformly.\newline
+Example: this procedure produces the following covering set when $m(i)$ is the binary representation of $i$:
+}
+
+\[ \left( \begin{array}{ccccccc}
+1 & 0 & 1 & 0 & 1 & 0 & 1 \\
+0 & 1 & 1 & 0 & 0 & 1 & 1 \\
+1 & 1 & 0 & 0 & 1 & 1 & 0 \\
+0 & 0 & 0 & 1 & 1 & 1 & 1 \\
+1 & 0 & 1 & 1 & 0 & 1 & 0 \\
+0 & 1 & 1 & 1 & 1 & 0 & 0 \\
+1 & 1 & 0 & 1 & 0 & 0 & 1 \\
+\end{array} \right)\] 
+
+\small{1 samples the coordinate. More efficient than having ${d \choose r}$ possible values for $a$.}
+
+\end{frame}
+
+\section{Our LSH construction}
+
+\begin{frame}{$\ell_1$ LSH w/o false negatives}
+\pause
+\begin{enumerate}
+\item[Goal:] Create an efficient Hashing that always collide close points and rarely collide far points
+\pause
+\item[Plan:] 
+\begin{itemize}
+\item Embed $\ell1$ into Hamming 
+\item Hash Hamming
+\end{itemize} 
+\pause
+\item[Embed:] Assuming $x \in [M]^d$, we can embed $x$ to $\zo^{Md}$ using unary embedding (as we saw in PS4) and hash that.
+\pause
+\item[Eff.:] 
+\begin{itemize}
+\item $T = \BO(M \cdot d \cdot n^\rho)$ 
+\item $S = \BO(M \cdot d \cdot n^{1+\rho})$ 
+\end{itemize} 
+\end{enumerate}
+\pause
+\centering
+{\Large Can we do better?}
+\end{frame}
+
+\begin{frame}{$\ell_1$ Embedding Setup}
+\begin{itemize}
+\item Can we use Sampling ?
+\pause
+\begin{itemize}
+\item Random Sampling will miss far points too often
+\item Grid shifting can cut close points - exponential (in $r$ or $d$) cost to avoid that prob.
+\end{itemize}
+\pause
+\item \textbf{Our Solution - Modulo Embedding}
+\begin{itemize}
+\item Keep close points close
+\item Contract distance of far points - but keep them far enough $(>cr)$ with constant probability 
+\item Amplify probability by iterating and concatenating
+\end{itemize}
+\end{itemize} 
+
+\end{frame}
+
+\begin{frame}{Modulo Mapping}
+\begin{itemize}
+\item Define $f_\alpha : \N \rightarrow \zo^{\alpha}$ to be the following mapping with parameter $\alpha$:
+\[
+f_\alpha(x) =
+\begin{cases}
+    0^{\alpha-\beta}1^\beta,& \text{if } \beta < \alpha\\
+    1^{2\alpha-\beta}0^{\beta-\alpha},              & \text{otherwise}
+\end{cases}
+\]
+Where $\beta = x \pmod {2\alpha}$.
+\item Example with \alpha = 5:\newline
+$\small{\begin{array}{cc}
+			\beta=0 \rightarrow 00000 & \beta=5 \rightarrow 11111 \\
+			\beta=1 \rightarrow 00001 & \beta=6 \rightarrow 11110 \\
+			\beta=2 \rightarrow 00011 & \beta=7 \rightarrow 11100 \\
+			\beta=3 \rightarrow 00111 & \beta=8 \rightarrow 11000 \\
+			\beta=4 \rightarrow 01111 & \beta=9 \rightarrow 10000\end{array}}
+\pause
+\item \textbf{$f_\alpha$ preserves modulo distance !}\newline
+        $\norm{f_\alpha(x) - f_\alpha(y)}_{Ham} = \norm{f_\alpha(|x-y|)}_1$\newline
+        $= \min(x-y \pmod {2\alpha} ,y-x\pmod {2\alpha}) $
+\end{itemize} 
+\end{frame}
+
+\begin{frame}{$\ell1 \rightarrow $ Hamming Modulo Embedding - Construction }
+\begin{itemize}
+\item Define $T : [M]^d \rightarrow \zo^*$ as follows:
+\begin{itemize}
+\item Randomly pick $k=log(n)$ integers $\alpha_1..\alpha_k$ from $[A, 2A]$, where $A=\max(5cr,\log(M))$
+\item Run $f_{\alpha_j}(x_i)$ for each $i \in [d], j \in [k]$
+\item Concatenate all strings
+\end{itemize}
+\item Given input $x \in [M]^d$, we will hash $T(x)$ using Pagh with $r'=k \cdot r$
+\end{itemize} 
+\end{frame}
+
+\begin{frame}{$\ell1 \rightarrow $ Hamming Modulo Embedding - Analysis }
+\begin{itemize}
+\item Final Dimension: $\BO(d \cdot \log(n) \cdot (r +\log(M)))$ (but also now we are in bit-space, so representation and computation are $\log(M)$ faster).
+\begin{itemize}
+\item $T = \BO((r + \log(M)) \cdot \log(n) \cdot d \cdot n^\rho)$ 
+\item $S = \BO((r + \log(M)) \cdot \log(n) \cdot d \cdot n^{1+\rho})$ 
+\end{itemize} 
+\item When $r=\Theta(log(n))$ (this is where Pagh focus on and when his algo is optimal and $\rho=1/c$) - our expected query time is $T = \BO(\polylog(n,M) \cdot d \cdot n^{1/c})$ which is much faster than any existing deterministic $\ell1$ NNS algorithm with near-linear space.
+\end{itemize} 
+\end{frame}
+
+
+\section{Conjecture}
+
+\begin{frame}{Conjecture behind Construction}
+\begin{itemize}
+\item Conjecture: The modulo function keeps close points close all the time, and any far point will stay far on average. Specifically:
+$$\forall x > 1, \forall A \geq \log(x), \alpha\sim\mathcal{U}[A,2A] : $$
+$$\E_\alpha[\min(x \mod {2\alpha},-x \mod {2\alpha}) ] \geq \min(x,\epsilon\alpha)$$
+For some constant $\epsilon$
+\item As long as we sample $\alpha_i \geq 2cr/\epsilon$, then expectation for far coordinates is larger than $2cr$.
+\item Variance is bounded by range
+\item After $\log(n)$ times $O(1)$ far points will become close
+\item Cannot be 100\% correct for any $A$ (think about $x=LCM(\alpha_1 \ldots \alpha_k) + 1$)
+\begin{itemize}
+\item It's okay since $LCM(\alpha_1 \ldots \alpha_k) > M$
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Test of conjecture}
+\begin{itemize}
+\item We run the following experiments
+%\item Deterministic pick all even numbers in $[10cr, 20cr]$
+%\begin{itemize}
+%\item $cr = 4 \sim 50, K = 5cr, M = 10^8$, conjecture holds %with probability $1$
+%\end{itemize}
+\item \textbf{Completeness Test}
+\begin{itemize}
+\item Test all $[2^{26}], K=20, cr \in [4, 50]$.
+\item No far points becomes close in $T=10$ rounds for each $cr$.
+\end{itemize}
+\item \textbf{Big Numbers Test}
+\begin{itemize}
+\item Each round randomly sample $2^{20}$ numbers in $[2^{60}], K=20, cr \in \{4, 10, 50, 100\}$.
+\item No far points becomes close in $T=100$ rounds for each $cr$.
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\section{Future work}
+
+\begin{frame}{What if r is big?}
+\begin{itemize}
+\item If we need to hash with big r, we can replace r factor with d and pay constant growth in exponent and denominator (trade-off)
+\item Divide each coordinate by $\tfrac{r\Delta}{d}$ (for some constant $\Delta < c - 1$) and round them to the nearest integer.
+\item far point might contract to $\tfrac{cr}{1+\Delta}$, so we hash (using Pagh) with $c'=\tfrac{c}{1+\Delta}$.
+\item Final dimension becomes $\BO(\log(n) (d^2 + d \log(M))/\Delta)$ and the time becomes $\approx n^{\rho + \Delta}$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Acknowledgements}
+\begin{itemize}
+    \item Alex for helping us with our project direction.
+    \item Pagh, Rasmus. "Locality-sensitive hashing without false negatives." arXiv preprint arXiv:1507.03225 (2015).
+\end{itemize}
+\end{frame}
+
+\begin{frame}{End}
+\begin{center}
+\huge{Thank you}
+\\
+\vspace{10mm}
+\Large{Questions?}
+\end{center}
+\end{frame}
+
+\end{document}
+
