@@ -26,36 +26,6 @@
 \usepackage{mathtools}
 \usepackage{color}
 
-\newcommand{\zo}{\{0,1\}}
-\newcommand{\mzo}{\{-1,+1\}}
-\newcommand{\F}{{\mathbb{F}}}
-\newcommand{\N}{{\mathbb{N}}}
-\newcommand{\Z}{{\mathbb{Z}}}
-\newcommand{\R}{{\mathbb{R}}}
-\newcommand{\C}{{\mathbb{C}}}
-\newcommand{\BO}{{\mathcal{O}}}
-\newcommand{\eps}{\epsilon}
-\newcommand{\tO}{\tilde{O}}
-\newcommand{\Vol}{\mathop\mathrm{Vol}\nolimits}
-\newcommand{\Const}{\mathop\mathrm{Const}\nolimits}
-\newcommand{\EX}{{\mathbb E}}
-\newcommand{\Sur}{\mathop\mathrm{Sur}\nolimits}
-\newcommand{\polylog}{\mathop\mathrm{polylog}\nolimits}
-\newcommand{\xor}{\oplus}
-\newcommand{\conj}[1]{{\overline {#1}}} %% conjugate
-\DeclareMathOperator{\ed}{ed}
-\DeclareMathOperator{\inv}{inv}
-\DeclareMathOperator{\poly}{poly}
-\DeclareMathOperator{\sk}{{\bf sk}}
-\DeclareMathOperator{\Supp}{supp}
-\DeclareMathOperator{\wt}{wt}
-\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
-\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
-
-\newcommand{\E}{{\mathbb E}}
-\newcommand{\Var}{{\bold {Var}}}
-\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
-
 \definecolor{important}{RGB}{38, 90, 173}
 
 %\usepackage{beamerthemeshadow}
@@ -124,13 +94,12 @@ The hash family, $\mathcal{H} : \{g:\{0,1\}^d \to \{0,1\}^k\}$, is defined as:
 where
 \[ h_i(p):= p_j \mbox{ for random } j \leftarrow [d].\]
 
-For NNS, we maintain $L = n^\rho$ such Hamming-LSH tables $g$.
-
+Randomly selects $k$ bits from $d$-dimensional point. For NNS, we maintain $L = n^\rho$ such Hamming-LSH tables $g$.
 \end{frame}
 
 \begin{frame}{LSH from Pagh'16}
 \begin{itemize}
-    \item It's \textbf{covering} - guarantees collision for $\norm{x-y} \leq r$. ie. Probability of false negatives is 0.
+    \item It's \textbf{covering} - guarantees collision for $\norm{x-y} \leq r$. ie. $P_1 = 1$. Probability of false negatives is 0.
     \pause
     \item Far points \textbf{collide with low probability}.
     \pause
@@ -159,7 +128,7 @@ $\mathcal{H}_{\mathcal{A}} = \{x \mapsto x \wedge a | a \in \mathcal{A}\}$ where
 
 $\mathcal{A}(m) = \{a(v) | v \in \{0,1\}^{r+1} \setminus \{\mathbf{0}\}\}$ where $a(v)_i = \langle m(i),v \rangle$ $\forall$ $v \in \{0,1\}^{r+1}$ and $m : \{1,\cdots,d\} \rightarrow \{0,1\}^{r+1}$.\newline
 Pick random function $m$ uniformly.\newline
-Example: this procedure produces the following covering set when $m(i)$ is the binary representation of $i$:
+Example: This procedure produces the following covering set when $m(i)$ is the binary representation of $i$:
 }
 
 \[ \left( \begin{array}{ccccccc}
